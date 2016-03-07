@@ -14,6 +14,9 @@
             "Test\\Junty\\TaskRunner\\": "tests/Junty/TaskRunner/"
         }
     },
+    "require": {
+        "symfony/console": "^3.0"
+    },
     "require-dev": {
         "phpunit/phpunit": "^5.2"
     }
