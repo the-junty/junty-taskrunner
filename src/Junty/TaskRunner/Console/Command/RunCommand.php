@@ -9,7 +9,7 @@
 namespace Junty\TaskRunner\Console\Command;
 
 use Junty\TaskRunner\Runner\RunnerInterface;
-use Junty\TaskRunner\Task\Task;
+use Junty\TaskRunner\Task\{GroupInterface, Task};
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\{InputArgument, InputInterface};
 use Symfony\Component\Console\Output\OutputInterface;
@@ -30,17 +30,27 @@ class RunCommand extends Command
         $this->setName('run')
             ->setDescription('Run tasks')
             ->addArgument(
-                'task',
+                'group_or_task',
                 InputArgument::OPTIONAL
             );
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        if ($input->hasArgument('task') && $task = $input->getArgument('task') !== null) {
-            $output->writeln('Executing task: ' . $task = $input->getArgument('task'));
+        if ($input->hasArgument('group_or_task') && $task = $input->getArgument('group_or_task') !== null) {
+            $el = $input->getArgument('group_or_task');
 
-            $this->runner->runTask($task);
+            if ($this->runner->getGroups()->containsKey($el)) {
+                $group = $this->runner->getGroups()->get($el);
+                $output->writeln('Executing group \'' . $group->getName() . '\'');
+
+                $this->executeGroup($group, $output);
+            } elseif ($this->runner->getTasks()->containsKey($el)) {
+                $task = $this->runner->getTasks()->get($el);
+                $output->writeln('Executing task \'' . $task->getName() . '\'');
+
+                $this->runner->runTask($task);
+            }
         } else {
             $els = $this->runner->getOrder();
 
@@ -54,20 +64,11 @@ class RunCommand extends Command
                 try {
                     if ($data['type'] == 'group') {
                         $group = $this->runner->getGroups()->toArray()[$data['name']];
-                        $tasks = $group->getTasks();
-
-                        foreach ($tasks as $task) {
-                            $output->writeln('--Executing task \'' . $task->getName() . '\'');
-
-                            try {
-                                $this->runner->runTask($task);
-                            } catch (\Exception $e) {
-                                $output->writeln('--Error on task \'' . $task->getName() . '\': ' . $e->getMessage());
-                            }
-                        }
+                        
+                        $this->executeGroup($group, $output);
                     } else {
                         $output->writeln('Executing task \'' . $data['name'] . '\'');
-                        $task->runTask($data['name']);
+                        $this->runner->runTask($data['name']);
                     }
                 } catch (\Exception $e) {
                     $output->writeln('Error on ' . $data['type'] . ' \'' . $data['name'] . '\': ' . $e->getMessage());
@@ -75,8 +76,21 @@ class RunCommand extends Command
             }
         }
 
-        $time = round((microtime(true) - $_SERVER['REQUEST_TIME_FLOAT']) * 100);
+        $time = round((microtime(true) - $_SERVER['REQUEST_TIME_FLOAT']) * 10000);
         $output->writeln('Finished! Time: ' . $time . 'ms');
+    }
+
+    private function executeGroup(GroupInterface $group, OutputInterface $output)
+    {
+        foreach ($group->getTasks() as $task) {
+            $output->writeln('--Executing task \'' . $task->getName() . '\'');
+
+            try {
+                $this->runner->runTask($task);
+            } catch (\Exception $e) {
+                $output->writeln('--Error on task \'' . $task->getName() . '\': ' . $e->getMessage());
+            }
+        }
     }
 
     private function getFromOrderData($name)
