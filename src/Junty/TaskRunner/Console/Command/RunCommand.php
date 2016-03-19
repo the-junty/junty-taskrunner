@@ -42,20 +42,49 @@ class RunCommand extends Command
 
             $this->runner->runTask($task);
         } else {
-            $tasks = $this->runner->getTasks();
+            $els = $this->runner->getOrder();
+
             $output->writeln('Executing tasks');
             
-            foreach ($tasks as $task) {
+            foreach ($els as $el) {
+                $data = $this->getFromOrderData($el);
+
+                $output->writeln('Executing ' . $data['type'] . ' \'' . $data['name'] . '\'');
+
                 try {
-                    $output->writeln('Executing task \'' . $task->getName() . '\'');
-                    $this->runner->runTask($task);
+                    if ($data['type'] == 'group') {
+                        $group = $this->runner->getGroups()->toArray()[$data['name']];
+                        $tasks = $group->getTasks();
+
+                        foreach ($tasks as $task) {
+                            $output->writeln('--Executing task \'' . $task->getName() . '\'');
+
+                            try {
+                                $this->runner->runTask($task);
+                            } catch (\Exception $e) {
+                                $output->writeln('--Error on task \'' . $task->getName() . '\': ' . $e->getMessage());
+                            }
+                        }
+                    } else {
+                        $output->writeln('Executing task \'' . $data['name'] . '\'');
+                        $task->runTask($data['name']);
+                    }
                 } catch (\Exception $e) {
-                    $output->writeln('Error on task \'' . $task->getName() . '\': ' . $e->getMessage());
+                    $output->writeln('Error on ' . $data['type'] . ' \'' . $data['name'] . '\': ' . $e->getMessage());
                 }
             }
         }
 
-        $time = round((microtime(true) - $_SERVER['REQUEST_TIME_FLOAT']) * 100) / 100;
+        $time = round((microtime(true) - $_SERVER['REQUEST_TIME_FLOAT']) * 100);
         $output->writeln('Finished! Time: ' . $time . 'ms');
+    }
+
+    private function getFromOrderData($name)
+    {
+        $parts = explode('::', $name);
+        $type = $parts[0];
+        unset($parts[0]);
+
+        return ['type' => $type, 'name' => implode('::', $parts)];
     }
 }
