@@ -67,7 +67,6 @@ class RunCommand extends Command
                         
                         $this->executeGroup($group, $output);
                     } else {
-                        $output->writeln('Executing task \'' . $data['name'] . '\'');
                         $this->runner->runTask($data['name']);
                     }
                 } catch (\Exception $e) {
