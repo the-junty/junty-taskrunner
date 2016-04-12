@@ -6,7 +6,7 @@ Junty task runner component.
 
 ## Install
 ```console
-$ composer require junty/task-runner
+$ composer require junty/junty-taskrunner
 ```
 
 ## Usage
