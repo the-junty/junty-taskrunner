@@ -1,9 +1,10 @@
-junty-taskrunner
+JuntyTaskRunner
 ================
+[![Packagist](https://img.shields.io/packagist/v/junty/junty-taskrunner.svg?style=flat-square)](https://packagist.org/packages/junty/junty-taskrunner) [![Travis](https://img.shields.io/travis/the-junty/junty-taskrunner.svg?style=flat-square)](https://travis-ci.org/the-junty/junty-taskrunner) [![Scrutinizer](https://img.shields.io/scrutinizer/g/the-junty/junty-taskrunner.svg?style=flat-square)](https://scrutinizer-ci.com/g/the-junty/junty-taskrunner/?branch=master) [![GitHub license](https://img.shields.io/github/license/the-junty/junty-taskrunner.svg?style=flat-square)](https://github.com/the-junty/junty-taskrunner/blob/master/LICENSE.md)
+
 Junty task runner component.
 
 ## Install
-============
 ```console
 $ composer require junty/task-runner
 ```
