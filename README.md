@@ -23,6 +23,10 @@ $runner->task('say_hello', function () {
     echo 'hello!'; 
 });
 
+$runner->my_task_2 = function () {
+    // ...
+};
+
 $runner->group('tests', function () {
     $this->task('tests_for_users', function () {
         // ...

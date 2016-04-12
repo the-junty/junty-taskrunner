@@ -230,4 +230,17 @@ class RunnerTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($_SERVER['FUDEU'], 'sim');
         $this->assertEquals($_SERVER['TRANQUILO'], 'favoravel');
     }
+
+    /**
+     * @covers ::__set
+     * @covers ::getTasks
+     */
+    public function testCreatingTaskSettingProperty()
+    {
+        $runner = new Runner();
+        $runner->my_task = function () {};
+        $tasks = $runner->getTasks();
+
+        $this->assertArrayHasKey('my_task', $tasks);
+    }
 }

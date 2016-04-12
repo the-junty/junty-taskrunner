@@ -63,6 +63,17 @@ class Runner implements RunnerInterface
     }
 
     /**
+     * Allows create a task setting a property
+     *
+     * @param string|TaskInterface $task
+     * @param callable             $callback
+     */
+    public function __set(string $task, callable $callback)
+    {
+        $this->task($task, $callback);
+    }
+
+    /**
      * Organize tasks and groups order
      * If this method is executed and a task and a group is not in this list, it won't be executed
      *
