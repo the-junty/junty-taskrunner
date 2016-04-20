@@ -235,10 +235,34 @@ class RunnerTest extends \PHPUnit_Framework_TestCase
      * @covers ::__set
      * @covers ::getTasks
      */
-    public function testCreatingTaskSettingProperty()
+    public function testCreatingTaskSettingPropertyWithAFunction()
     {
         $runner = new Runner();
         $runner->my_task = function () {};
+        $tasks = $runner->getTasks();
+
+        $this->assertArrayHasKey('my_task', $tasks);
+    }
+
+    /**
+     * @covers ::__set
+     * @covers ::getTasks
+     */
+    public function testCreatingTaskSettingPropertyWithTaskInstance()
+    {
+        $runner = new Runner();
+        $runner->my_task = new class() extends AbstractTask {
+            public function getName() : string
+            {
+                return 'my_task';
+            }
+
+            public function getCallback() : callable
+            {
+                return function () {};
+            }
+        };
+
         $tasks = $runner->getTasks();
 
         $this->assertArrayHasKey('my_task', $tasks);

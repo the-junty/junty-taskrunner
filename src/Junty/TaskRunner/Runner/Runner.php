@@ -65,11 +65,15 @@ class Runner implements RunnerInterface
     /**
      * Allows create a task setting a property
      *
-     * @param string|TaskInterface $task
-     * @param callable             $callback
+     * @param string                 $task
+     * @param callable|TaskInterface $callback
      */
-    public function __set(string $task, callable $callback)
+    public function __set(string $task, $callback)
     {
+        if(!is_callable($callback) && !$callback instanceof TaskInterface) {
+            throw new \InvalidArgumentException('Task must be callable or instanceof TaskInterface.');
+        }
+
         $this->task($task, $callback);
     }
 
